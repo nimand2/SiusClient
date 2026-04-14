@@ -137,7 +137,6 @@
             this.lbl1.Size = new System.Drawing.Size(232, 20);
             this.lbl1.TabIndex = 2;
             this.lbl1.Text = "Sius Daten Expoprt / Import";
-            this.lbl1.Click += new System.EventHandler(this.label1_Click);
             // 
             // panel11
             // 
@@ -177,7 +176,6 @@
             this.btnVerbindungStarten.TabIndex = 10;
             this.btnVerbindungStarten.Text = "Verbindung Starten";
             this.btnVerbindungStarten.UseVisualStyleBackColor = false;
-            this.btnVerbindungStarten.Click += new System.EventHandler(this.button1_Click);
             // 
             // tbPasswort
             // 
@@ -363,7 +361,6 @@
             this.lblAnlass.Size = new System.Drawing.Size(60, 18);
             this.lblAnlass.TabIndex = 12;
             this.lblAnlass.Text = "Anlass :";
-            this.lblAnlass.Click += new System.EventHandler(this.label9_Click);
             // 
             // cbAnlass
             // 
