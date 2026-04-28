@@ -40,6 +40,10 @@ namespace SiusClient
         {
             InitializeComponent();
 
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+
             btnOrdnerImport.Click += btnOrdnerImport_Click;
             btnOrdnerExport.Click += btnOrdnerExport_Click;
             btnVerbindungStarten.Click += btnVerbindungStarten_Click;
@@ -67,6 +71,7 @@ namespace SiusClient
         public class LoginResponse
         {
             public string Token { get; set; } = string.Empty;
+            public int ExpiresIn { get; set; }
         }
 
         public class ShooterDto
@@ -385,7 +390,7 @@ namespace SiusClient
             if (!File.Exists(pfad))
                 return;
 
-            string[] alleZeilen = File.ReadAllLines(pfad, Encoding.UTF8);
+            string[] alleZeilen = File.ReadAllLines(pfad, Encoding.GetEncoding("ISO-8859-1"));
 
             if (alleZeilen.Length <= _letzteImportierteZeilenAnzahl)
                 return;
@@ -503,7 +508,7 @@ namespace SiusClient
 
             if (neueCsvZeilen.Count > 0)
             {
-                File.AppendAllLines(exportPfad, neueCsvZeilen, Encoding.UTF8);
+                File.AppendAllLines(exportPfad, neueCsvZeilen, Encoding.GetEncoding("ISO-8859-1"));
             }
 
             _anzahlSchuetzen += neueCsvZeilen.Count;
