@@ -306,22 +306,17 @@ namespace SiusClient
             string json = await response.Content.ReadAsStringAsync();
             var shooters = JsonSerializer.Deserialize<List<ShooterDto>>(json, _jsonOptions) ?? new List<ShooterDto>();
 
-            var csvZeilen = new List<string>
-            {
-                "Id;Startnummer;Name;Vorname;Verein;Bahn;Abloesung;Aktiv"
-            };
+            var csvZeilen = new List<string>();
 
             foreach (var s in shooters)
             {
-                csvZeilen.Add(string.Join(";",
+                string anzeigename = $"{s.Vorname[0]}. {s.Name}";
+                csvZeilen.Add(string.Join(",",
                     s.Id,
-                    s.Startnummer,
                     CsvEscape(s.Name),
                     CsvEscape(s.Vorname),
-                    CsvEscape(s.Verein),
-                    s.Bahn,
-                    s.Abloesung,
-                    s.Aktiv ? 1 : 0));
+                    CsvEscape(anzeigename),
+                    "", "", "", "", "", "", ""));
             }
 
             File.WriteAllLines(tbExportDatei.Text.Trim(), csvZeilen, Encoding.UTF8);
@@ -478,32 +473,19 @@ namespace SiusClient
                 return;
 
             string exportPfad = tbExportDatei.Text.Trim();
-            if (!File.Exists(exportPfad))
-            {
-                File.WriteAllLines(exportPfad, new[] { "Id;Startnummer;Name;Vorname;Verein;Bahn;Abloesung;Aktiv" }, Encoding.UTF8);
-            }
-
-            var vorhandeneZeilen = new HashSet<string>(File.ReadAllLines(exportPfad, Encoding.UTF8));
             var neueCsvZeilen = new List<string>();
 
             foreach (var s in neueShooter)
             {
-                string csv = string.Join(";",
+                string anzeigename = $"{s.Vorname[0]}. {s.Name}";
+                string csv = string.Join(",",
                     s.Id,
-                    s.Startnummer,
                     CsvEscape(s.Name),
                     CsvEscape(s.Vorname),
-                    CsvEscape(s.Verein),
-                    s.Bahn,
-                    s.Abloesung,
-                    s.Aktiv ? 1 : 0);
+                    CsvEscape(anzeigename),
+                    "", "", "", "", "", "", "");
 
-                // Nur Nummer + Name darf doppelt sein, darum prüfen wir die ganze Zeile.
-                if (!vorhandeneZeilen.Contains(csv))
-                {
-                    neueCsvZeilen.Add(csv);
-                    vorhandeneZeilen.Add(csv);
-                }
+                neueCsvZeilen.Add(csv);
             }
 
             if (neueCsvZeilen.Count > 0)
