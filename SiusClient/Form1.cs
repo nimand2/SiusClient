@@ -308,6 +308,18 @@ namespace SiusClient
 
             var csvZeilen = new List<string>();
 
+            string exportPfad = tbExportDatei.Text.Trim();
+            // Wenn die Datei nicht existiert oder leer ist, Dummy-Zeile mit ID=0 hinzufügen
+            if (!File.Exists(exportPfad) || new FileInfo(exportPfad).Length == 0)
+            {
+                csvZeilen.Add(string.Join(",",
+                    0,
+                    CsvEscape("DummyName"),
+                    CsvEscape("Dummy"),
+                    CsvEscape("D. DummyName"),
+                    "", "", "", "", "", "", ""));
+            }
+
             foreach (var s in shooters)
             {
                 string anzeigename = $"{s.Vorname[0]}. {s.Name}";
@@ -319,7 +331,7 @@ namespace SiusClient
                     "", "", "", "", "", "", ""));
             }
 
-            File.WriteAllLines(tbExportDatei.Text.Trim(), csvZeilen, Encoding.UTF8);
+            File.WriteAllLines(exportPfad, csvZeilen, Encoding.UTF8);
 
             _anzahlSchuetzen = shooters.Count;
             _hoechsteSchuetzennummer = shooters.Count == 0 ? 0 : shooters.Max(x => x.Startnummer);
