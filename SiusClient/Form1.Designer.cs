@@ -30,6 +30,7 @@
         {
             this.tbExportDatei = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnNeuEinlesen = new System.Windows.Forms.Button();
             this.btnOrdnerImport = new System.Windows.Forms.Button();
             this.btnOrdnerExport = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -71,6 +72,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btnNeuEinlesen);
             this.panel1.Controls.Add(this.btnOrdnerImport);
             this.panel1.Controls.Add(this.btnOrdnerExport);
             this.panel1.Controls.Add(this.label1);
@@ -82,6 +84,15 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(778, 134);
             this.panel1.TabIndex = 2;
+            // 
+            // btnNeuEinlesen
+            // 
+            this.btnNeuEinlesen.Location = new System.Drawing.Point(664, 107);
+            this.btnNeuEinlesen.Name = "btnNeuEinlesen";
+            this.btnNeuEinlesen.Size = new System.Drawing.Size(113, 20);
+            this.btnNeuEinlesen.TabIndex = 8;
+            this.btnNeuEinlesen.Text = "Neu einlesen";
+            this.btnNeuEinlesen.UseVisualStyleBackColor = true;
             // 
             // btnOrdnerImport
             // 
@@ -396,6 +407,7 @@
         private System.Windows.Forms.TextBox tbExportDatei;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label lbl1;
+        private System.Windows.Forms.Button btnNeuEinlesen;
         private System.Windows.Forms.Button btnOrdnerImport;
         private System.Windows.Forms.Button btnOrdnerExport;
         private System.Windows.Forms.Label label1;

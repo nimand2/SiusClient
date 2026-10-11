@@ -379,24 +379,32 @@ Dezimalwerte dürfen in der CSV ein Komma oder einen Punkt verwenden. Der Client
 
 ## SIUS-CSV Exportdatei
 
-Der Client schreibt beim Auswählen eines Anlasses die komplette Schützenliste in die Exportdatei.
-
-**Header**
-
-```csv
-Id;Startnummer;Name;Vorname;Verein;Bahn;Abloesung;Aktiv
-```
+Der Client schreibt beim Auswählen eines Anlasses die komplette Schützenliste mit `ISO-8859-1`, ohne Header und mit Komma als Trennzeichen. Jede Zeile hat elf Felder: ID, Name, Vorname, Anzeigename und sieben leere Felder. Die erste Zeile ist stets der Dummy-Eintrag mit ID 0.
 
 **Beispiel**
 
 ```csv
-Id;Startnummer;Name;Vorname;Verein;Bahn;Abloesung;Aktiv
-12;12;Muster;Max;Schützenverein Beispiel;0;0;1
+0,DummyName,Dummy,D. DummyName,,,,,,,
+12,Muster,Max,M. Muster,,,,,,,
 ```
 
-Beim initialen Export schreibt der Client UTF-8. Beim Anhängen neuer Schützen verwendet der aktuelle Client `ISO-8859-1`.
+Textfelder mit Kommas, Anführungszeichen oder Zeilenumbrüchen werden in Anführungszeichen eingeschlossen; enthaltene Anführungszeichen werden verdoppelt. Bei leerem Vornamen besteht der Anzeigename nur aus dem Nachnamen. Zeichen außerhalb von ISO-8859-1 führen zu einem sichtbaren Exportfehler statt stiller Ersetzung durch Fragezeichen.
 
-Semikolons in Textfeldern werden durch Kommas ersetzt.
+Neue Schützen werden anhand ihrer ID dedupliziert und ergänzt. Vollständiger Export und Ergänzungen werden zunächst in eine temporäre Datei im selben Verzeichnis geschrieben und dann atomar ausgetauscht. Bei Schreibfehlern bleibt die bisherige Datei erhalten. Dateisperren werden bis zu fünfmal mit asynchroner Wartezeit behandelt.
+
+## Fehlerverhalten und Importfortschritt
+
+- Der Import liest ab der zuletzt bestätigten Byteposition, höchstens 64 KiB bzw. 500 vollständige Zeilen pro Durchlauf. Eine Zeile wird erst nach ihrem abschließenden LF (oder CRLF) verarbeitet.
+- Kürzere Dateien werden wieder ab Position 0 gelesen; bereits bestätigte LogEvent-IDs bleiben dabei dedupliziert. Bei Austausch oder Überschreiben durch eine gleich große oder größere Datei muss „Neu einlesen“ verwendet werden.
+- Fortschritt, Duplikatmarkierungen und Zähler werden erst nach HTTP-Erfolg und `success: true` im JSON gespeichert. Bei einem Übertragungsfehler wird der Block erneut versucht.
+- Ungültige vollständige Zeilen stoppen den betreffenden Block mit einer Fehlermeldung in der Fenstertitelleiste. Nach Korrektur wird automatisch erneut gelesen. Sie werden nicht stillschweigend verworfen.
+- Import- und Exportfehler werden unabhängig behandelt und in der Fenstertitelleiste angezeigt; nach erfolgreichem Wiederholungsversuch wird die jeweilige Meldung entfernt. HTTP-Anfragen haben ein Timeout von 30 Sekunden.
+- Anlasswechsel, erneutes Verbinden und „Neu einlesen“ warten auf das Ende der bisherigen Überwachung. Beim Anlasswechsel wird der Importfortschritt zurückgesetzt. Während der Überwachung sind Pfade und Verbindungsdaten gegen Änderungen gesperrt.
+- Der Fortschritt wird nur im Arbeitsspeicher gehalten. Nach Neustart bzw. „Neu einlesen“ wird die Datei erneut verarbeitet. Falls der Server Daten speichert, aber seine Antwort verloren geht, kann auch eine Wiederholung Duplikate erzeugen. Für garantierte Duplikatfreiheit muss die Server-API Importe idempotent behandeln; dies wird durch den Client allein nicht garantiert.
+
+## Lokale Regressionstests
+
+`powershell -File tests/run.ps1` baut den Debug-Client ohne ClickOnce-Signierung und führt die Regressionstests aus. Benötigt werden Visual Studio mit MSBuild, .NET Framework 4.7.2 und die bereits wiederhergestellten NuGet-Pakete. Die Tests verwenden temporäre Dateien und einen simulierten HTTP-Serverhandler, keine echte Serververbindung.
 
 ## Datenzuordnung auf dem Server
 
